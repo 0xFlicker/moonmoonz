@@ -11,7 +11,13 @@ import {CANONICAL_CORI_SUBSCRIPTION} from "operator-filter-registry/src/lib/Cons
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract MoonMoonz is ERC721A, ERC721AQueryable, Ownable, Pausable {
+contract MoonMoonz is
+    ERC721A,
+    ERC721AQueryable,
+    Ownable,
+    Pausable,
+    OperatorFilterer
+{
     uint16 constant MAX_SUPPLY = 10000;
 
     bool public holderMintActive = false;
@@ -34,7 +40,10 @@ contract MoonMoonz is ERC721A, ERC721AQueryable, Ownable, Pausable {
         address _erc20MintableAddress,
         address _erc721ClaimableAddress,
         string memory __baseURI
-    ) ERC721A("MoonMoonz", "MOONMOONZ") {
+    )
+        ERC721A("MoonMoonz", "MOONMOONZ")
+        OperatorFilterer(CANONICAL_CORI_SUBSCRIPTION, true)
+    {
         erc20MintableAddress = IERC20(_erc20MintableAddress);
         erc721ClaimableAddress = IERC721(_erc721ClaimableAddress);
         baseURI = __baseURI;
@@ -176,10 +185,14 @@ contract MoonMoonz is ERC721A, ERC721AQueryable, Ownable, Pausable {
 
     error MulticallFailed(uint256 index, bytes response);
 
-    function multicall(bytes[] calldata data) external payable returns (bytes[] memory results) {
+    function multicall(
+        bytes[] calldata data
+    ) external payable returns (bytes[] memory results) {
         results = new bytes[](data.length);
         for (uint256 i = 0; i < data.length; i++) {
-            (bool success, bytes memory response) = address(this).call{value: msg.value}(data[i]);
+            (bool success, bytes memory response) = address(this).call{
+                value: msg.value
+            }(data[i]);
             if (!success) revert MulticallFailed(i, response);
             results[i] = response;
         }
@@ -227,5 +240,4 @@ contract MoonMoonz is ERC721A, ERC721AQueryable, Ownable, Pausable {
             interfaceId == bytes4(0x49064906) ||
             super.supportsInterface(interfaceId);
     }
-
 }
