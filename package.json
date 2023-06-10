@@ -1,0 +1,13 @@
+{
+  "name": "moonMoonz-prod",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:0xflicker/moonmoonz.git",
+  "author": "John Dean <john.holmes.dean@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "www",
+    "contracts"
+  ]
+}
